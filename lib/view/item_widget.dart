@@ -219,7 +219,7 @@ class ItemWidgetState extends State<ItemWidget>
                       setState(() {});
                     }
                     widget.itemClickListener!
-                        .onItemClick(widget.index!, city.name!, city.code!);
+                        .onItemClick(widget.index!, city.name!, city.center!, city.code!);
                   },
                   child: Container(
                     width: double.infinity,
