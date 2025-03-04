@@ -175,13 +175,19 @@ class CityPickerState extends State<CityPickerWidget>
       for (int i = 0; i < widget.initialAddress!.length; i++) {
         _myTabs.add(TabTitle(index: i, title: widget.initialAddress![i].name));
         if (i != widget.initialAddress!.length - 1) {
-          _selectData.add(AddressNode(
+          _selectData.add(
+            AddressNode(
               code: widget.initialAddress![i].code,
-              name: widget.initialAddress![i].name));
+              name: widget.initialAddress![i].name,
+            ),
+          );
         }
       }
       _tabController = TabController(
-          vsync: this, length: _myTabs.length, initialIndex: _currentIndex);
+        vsync: this,
+        length: _myTabs.length,
+        initialIndex: _currentIndex,
+      );
       _pageController = PageController(initialPage: _currentIndex);
       for (int i = 0; i < widget.initialAddress!.length; i++) {
         if (i == 0) {
@@ -194,21 +200,24 @@ class CityPickerState extends State<CityPickerWidget>
           });
         } else {
           widget.cityPickerListener!
-              .onDataLoad(i, widget.initialAddress![i - 1].code!,
-                  widget.initialAddress![i - 1].name!)
+              .onDataLoad(
+                i,
+                widget.initialAddress![i - 1].code!,
+                widget.initialAddress![i - 1].name!,
+              )
               .then((value) {
-            List<SectionCity> list = sortCity(value);
-            _mData[i] = list;
-            if (mounted) {
-              setState(() {});
-            }
-          });
+                List<SectionCity> list = sortCity(value);
+                _mData[i] = list;
+                if (mounted) {
+                  setState(() {});
+                }
+              });
         }
       }
     } else {
-      widget.cityPickerListener!
-          .onDataLoad(_currentIndex, "", "")
-          .then((value) {
+      widget.cityPickerListener!.onDataLoad(_currentIndex, "", "").then((
+        value,
+      ) {
         List<SectionCity> list = sortCity(value);
         if (list.isEmpty) {
           widget.cityPickerListener!.onFinish(_selectData);
@@ -216,12 +225,14 @@ class CityPickerState extends State<CityPickerWidget>
         } else {
           _mData[_currentIndex] = list;
           if (mounted) {
-            _myTabs.add(TabTitle(
-                index: _currentIndex, title: widget.selectText ?? "请选择"));
+            _myTabs.add(
+              TabTitle(index: _currentIndex, title: widget.selectText ?? "请选择"),
+            );
             _tabController = TabController(
-                vsync: this,
-                length: _myTabs.length,
-                initialIndex: _currentIndex);
+              vsync: this,
+              length: _myTabs.length,
+              initialIndex: _currentIndex,
+            );
             if (mounted) {
               setState(() {});
             }
@@ -271,7 +282,7 @@ class CityPickerState extends State<CityPickerWidget>
   }
 
   @override
-  void onItemClick(int tabIndex, String name, String code) {
+  void onItemClick(int tabIndex, String name, String code, String center) {
     if (_isClick) {
       return;
     }
@@ -284,19 +295,25 @@ class CityPickerState extends State<CityPickerWidget>
       _selectData.removeRange(_currentIndex - 1, _selectData.length);
       _myTabs.removeRange(_currentIndex, _myTabs.length);
       _tabController = TabController(
-          vsync: this, length: _myTabs.length, initialIndex: _currentIndex - 1);
+        vsync: this,
+        length: _myTabs.length,
+        initialIndex: _currentIndex - 1,
+      );
       if (mounted) {
         setState(() {});
       }
     }
 
-    _selectData.insert(_currentIndex - 1, AddressNode(code: code, name: name));
+    _selectData.insert(
+      _currentIndex - 1,
+      AddressNode(code: code, center: center, name: name),
+    );
     _myTabs.elementAt(_currentIndex - 1).title =
         _selectData[_currentIndex - 1].name;
 
-    widget.cityPickerListener!
-        .onDataLoad(_currentIndex, code, name)
-        .then((value) {
+    widget.cityPickerListener!.onDataLoad(_currentIndex, code, name).then((
+      value,
+    ) {
       List<SectionCity> list = sortCity(value);
       if (list.isEmpty) {
         _isClick = false;
@@ -308,11 +325,18 @@ class CityPickerState extends State<CityPickerWidget>
       } else {
         _mData[_currentIndex] = list;
         _myTabs.add(
-            TabTitle(index: _currentIndex, title: widget.selectText ?? "请选择"));
+          TabTitle(index: _currentIndex, title: widget.selectText ?? "请选择"),
+        );
         _tabController = TabController(
-            vsync: this, length: _myTabs.length, initialIndex: _currentIndex);
-        _pageController!.animateToPage(_currentIndex,
-            duration: const Duration(milliseconds: 10), curve: Curves.linear);
+          vsync: this,
+          length: _myTabs.length,
+          initialIndex: _currentIndex,
+        );
+        _pageController!.animateToPage(
+          _currentIndex,
+          duration: const Duration(milliseconds: 10),
+          curve: Curves.linear,
+        );
         _isClick = false;
         if (mounted) {
           setState(() {});
@@ -324,20 +348,21 @@ class CityPickerState extends State<CityPickerWidget>
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        height: widget.height,
-        child: Column(
-          children: [
-            _topTextWidget(),
-            Expanded(
-              child: Column(
-                children: [
-                  _middleTabWidget(),
-                  Expanded(child: _bottomListWidget())
-                ],
-              ),
-            )
-          ],
-        ));
+      height: widget.height,
+      child: Column(
+        children: [
+          _topTextWidget(),
+          Expanded(
+            child: Column(
+              children: [
+                _middleTabWidget(),
+                Expanded(child: _bottomListWidget()),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   /// 头部文字组件
@@ -366,12 +391,13 @@ class CityPickerState extends State<CityPickerWidget>
               ),
           Expanded(child: Container()),
           InkWell(
-              onTap: () => Navigator.pop(context),
-              child: SizedBox(
-                width: widget.titleHeight,
-                height: double.infinity,
-                child: widget.closeWidget ?? const Icon(Icons.close, size: 26),
-              )),
+            onTap: () => Navigator.pop(context),
+            child: SizedBox(
+              width: widget.titleHeight,
+              height: double.infinity,
+              child: widget.closeWidget ?? const Icon(Icons.close, size: 26),
+            ),
+          ),
         ],
       ),
     );
@@ -390,14 +416,18 @@ class CityPickerState extends State<CityPickerWidget>
           if (mounted) {
             setState(() {});
           }
-          _pageController!.animateToPage(_currentIndex,
-              duration: const Duration(milliseconds: 10), curve: Curves.linear);
+          _pageController!.animateToPage(
+            _currentIndex,
+            duration: const Duration(milliseconds: 10),
+            curve: Curves.linear,
+          );
         },
         isScrollable: true,
         indicatorSize: TabBarIndicatorSize.tab,
         tabAlignment: TabAlignment.start,
-        padding:
-            EdgeInsets.only(left: widget.paddingLeft! - widget.tabPadding! / 2),
+        padding: EdgeInsets.only(
+          left: widget.paddingLeft! - widget.tabPadding! / 2,
+        ),
         indicatorPadding: EdgeInsets.only(
           left: widget.tabPadding! / 2,
           right: widget.tabPadding! / 2,
@@ -407,25 +437,28 @@ class CityPickerState extends State<CityPickerWidget>
           right: widget.tabPadding! / 2,
         ),
         dividerHeight: 0,
-        indicator: widget.showTabIndicator!
-            ? UnderlineTabIndicator(
-                borderSide: BorderSide(
-                  width: widget.tabIndicatorHeight!,
-                  color: widget.tabIndicatorColor ??
-                      Theme.of(context).primaryColor,
-                ),
-              )
-            : const BoxDecoration(),
+        indicator:
+            widget.showTabIndicator!
+                ? UnderlineTabIndicator(
+                  borderSide: BorderSide(
+                    width: widget.tabIndicatorHeight!,
+                    color:
+                        widget.tabIndicatorColor ??
+                        Theme.of(context).primaryColor,
+                  ),
+                )
+                : const BoxDecoration(),
         indicatorColor:
             widget.tabIndicatorColor ?? Theme.of(context).primaryColor,
         unselectedLabelColor: widget.unselectedLabelColor ?? Colors.black54,
         labelColor: widget.selectedLabelColor ?? Theme.of(context).primaryColor,
-        tabs: _myTabs.map((data) {
-          return Text(
-            data.title!,
-            style: TextStyle(fontSize: widget.labelTextSize),
-          );
-        }).toList(),
+        tabs:
+            _myTabs.map((data) {
+              return Text(
+                data.title!,
+                style: TextStyle(fontSize: widget.labelTextSize),
+              );
+            }).toList(),
       ),
     );
   }
@@ -441,31 +474,32 @@ class CityPickerState extends State<CityPickerWidget>
         }
         _tabController!.animateTo(_currentIndex);
       },
-      children: _myTabs.map((tab) {
-        return ItemWidget(
-          height: widget.height! - widget.titleHeight! - widget.tabHeight!,
-          index: tab.index,
-          list: _mData[tab.index],
-          title: tab.title,
-          selectText: widget.selectText,
-          backgroundColor: widget.backgroundColor,
-          paddingLeft: widget.paddingLeft,
-          itemHeadHeight: widget.itemHeadHeight,
-          itemHeadBackgroundColor: widget.itemHeadBackgroundColor,
-          itemHeadLineColor: widget.itemHeadLineColor,
-          itemHeadLineHeight: widget.itemHeadLineHeight,
-          itemHeadTextStyle: widget.itemHeadTextStyle,
-          itemHeight: widget.itemHeight,
-          indexBarWidth: widget.indexBarWidth,
-          indexBarItemHeight: widget.indexBarItemHeight,
-          indexBarBackgroundColor: widget.indexBarBackgroundColor,
-          indexBarTextStyle: widget.indexBarTextStyle,
-          itemSelectedIconWidget: widget.itemSelectedIconWidget,
-          itemSelectedTextStyle: widget.itemSelectedTextStyle,
-          itemUnSelectedTextStyle: widget.itemUnSelectedTextStyle,
-          itemClickListener: this,
-        );
-      }).toList(),
+      children:
+          _myTabs.map((tab) {
+            return ItemWidget(
+              height: widget.height! - widget.titleHeight! - widget.tabHeight!,
+              index: tab.index,
+              list: _mData[tab.index],
+              title: tab.title,
+              selectText: widget.selectText,
+              backgroundColor: widget.backgroundColor,
+              paddingLeft: widget.paddingLeft,
+              itemHeadHeight: widget.itemHeadHeight,
+              itemHeadBackgroundColor: widget.itemHeadBackgroundColor,
+              itemHeadLineColor: widget.itemHeadLineColor,
+              itemHeadLineHeight: widget.itemHeadLineHeight,
+              itemHeadTextStyle: widget.itemHeadTextStyle,
+              itemHeight: widget.itemHeight,
+              indexBarWidth: widget.indexBarWidth,
+              indexBarItemHeight: widget.indexBarItemHeight,
+              indexBarBackgroundColor: widget.indexBarBackgroundColor,
+              indexBarTextStyle: widget.indexBarTextStyle,
+              itemSelectedIconWidget: widget.itemSelectedIconWidget,
+              itemSelectedTextStyle: widget.itemSelectedTextStyle,
+              itemUnSelectedTextStyle: widget.itemUnSelectedTextStyle,
+              itemClickListener: this,
+            );
+          }).toList(),
     );
   }
 }
